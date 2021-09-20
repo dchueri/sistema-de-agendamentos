@@ -1,6 +1,6 @@
 const conexao = require('../infraestrutura/conexao')
 
-class Agendamentos {
+class Agendamento {
     adiciona(agendamentos) {
         const sql = 'INSERT INTO Agendamentos SET ?'
 
@@ -13,3 +13,5 @@ class Agendamentos {
         })
     }
 }
+
+module.exports = new Agendamento
