@@ -1,7 +1,7 @@
 {
-  "name": "sitetw",
+  "name": "sistema-de-agendamentos",
   "version": "1.0.0",
-  "description": "Site para auxilio no TribalWars",
+  "description": "Sistema de agendamentos em javascript",
   "main": "index.js",
   "scripts": {
     "start": "nodemon index.js",
