@@ -1,19 +1,18 @@
 class Tabelas {
     init(conexao) {
-        console.log('Tabelas chamadas')
         this.conexao = conexao
 
-        this.criarAgendamento()
+        this.criarAgendamentos()
     }
 
-    criarAgendamento() {
-        const sql = 'CREATE TABLE IF NOT EXISTS Agendamentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
-         
+    criarAgendamentos() {
+        const sql = 'CREATE TABLE IF NOT EXISTS Agendamentos (id int NOT NULL AUTO_INCREMENT, cliente varchar(50) NOT NULL, pet varchar(20), servico varchar(20) NOT NULL, data datetime NOT NULL, dataCriacao datetime NOT NULL, status varchar(20) NOT NULL, observacoes text, PRIMARY KEY(id))'
+
         this.conexao.query(sql, erro => {
             if(erro) {
                 console.log(erro)
             } else {
-                console.log('Tabela AGENDAMENTOS criada com sucesso!')
+                console.log('Tabela Agendamentos criada com sucesso')
             }
         })
     }
