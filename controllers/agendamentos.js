@@ -12,9 +12,13 @@ module.exports = app => {
     })
 
     app.post('/agendamentos', (req, res) => {
-       const agendamento = req.body
+        const agendamento = req.body
 
-        Agendamento.adiciona(agendamento, res)
+        Agendamento.adiciona(agendamento)
+            .then(agendamentoCadastrado => 
+                res.status(201).json(agendamentoCadastrado)
+            )
+            .catch(erros => res.status(400).json(erros))
     }) 
 
     app.patch('/agendamentos/:id', (req, res) => {

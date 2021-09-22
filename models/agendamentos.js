@@ -1,10 +1,14 @@
+const { default: axios } = require('axios')
 const moment = require('moment')
-const conexao = require('../infraestrutura/conexao')
+const conexao = require('../infraestrutura/database/conexao')
+const repositorio = require('../repositorios/agendamento')
 
 class Agendamento {
-    adiciona(agendamento, res) {
+    adiciona(agendamento) {
         const dataCriacao = moment().format('YYYY-MM-DD HH:MM:SS')
-        const data = moment(agendamento.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS')
+        const data = moment(agendamento.data, 'DD/MM/YYYY').format(
+            'YYYY-MM-DD HH:MM:SS'
+        )
         
         const dataEhValida = moment(data).isSameOrAfter(dataCriacao)
         const clienteEhValido = agendamento.cliente.length >= 5
@@ -26,21 +30,16 @@ class Agendamento {
         const existemErros = erros.length
 
         if(existemErros) {
-            res.status(400).json(erros)
+            return new Promise((resolve, reject) => reject(erros))
         } else {
             const agendamentoDatado = {...agendamento, dataCriacao, data}
-
-            const sql = 'INSERT INTO Agendamentos SET ?'
-    
-            conexao.query(sql, agendamentoDatado, (erro, resultados) => {
-                if(erro) {
-                    res.status(400).json(erro)
-                } else {
-                    res.status(201).json(agendamento)
-                }
+   
+            return repositorio.adiciona(agendamentoDatado)
+                .then(resultados => {
+                    const id = resultados.insertId
+                    return { ...agendamento, id }
             })
-        }
-       
+        } 
     }
 
     lista(res) {
@@ -58,11 +57,16 @@ class Agendamento {
     buscaPorId(id, res) {
         const sql = `SELECT * FROM Agendamentos WHERE id=${id}`
 
-        conexao.query(sql, (erro, resultados) => {
+        conexao.query(sql, async (erro, resultados) => {
             const agendamento = resultados[0]
+            const cpf = agendamento.cliente
             if(erro) {
                 res.status(400).json(erro)
             } else {
+                const { data } = await axios.get(`http://localhost:8082/${cpf}`)
+
+                agendamento.cliente = data
+
                 res.status(200).json(agendamento)
             }
         })
@@ -70,7 +74,9 @@ class Agendamento {
 
     altera(id, valores, res) {
         if(valores.data) {
-            valores.data = moment(valores.data, 'DD/MM/YYYY').format('YYYY-MM-DD HH:MM:SS')
+            valores.data = moment(valores.data, 'DD/MM/YYYY').format(
+                'YYYY-MM-DD HH:MM:SS'
+            )
         }      
         const sql = 'UPDATE Agendamentos SET ? WHERE id=?'
 
@@ -90,7 +96,7 @@ class Agendamento {
             if(erro) {
                 res.status(400).json(erro)
             } else {
-                res.status(200).json({id})
+                res.status(200).json({ id })
             }
         })
     }
